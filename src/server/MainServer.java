@@ -96,6 +96,10 @@ public class MainServer {
 		return new Challenge("What was your secret word?", registeredUserData.get(username));
 	}
 
+	public static String getPasswordHash(String username) {
+		return userPasswordHashes.get(username);
+	}
+
 	public static boolean isUsernameAlreadyRegistered(String username) {
 		return registeredUserData.containsKey(username);
 	}

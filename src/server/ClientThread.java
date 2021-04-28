@@ -8,6 +8,7 @@ import serialization.Challenge;
 import serialization.MessageFactory;
 import serialization.SerializableMessage;
 import serialization.SerializedObject;
+import sharedModels.AES;
 import sharedModels.ReadThread;
 import sharedModels.UserData;
 
@@ -107,7 +108,7 @@ public class ClientThread extends Thread {
 					while (true) {
 						try {
 							challengeResponseSerialized = assistant.getOut().remove();
-							System.out.print("Challenge response received");
+							System.out.print("Challenge response received: ");
 							break;
 						} catch (NoSuchElementException e) {
 							continue;
@@ -117,9 +118,12 @@ public class ClientThread extends Thread {
 					String challengeResponse = (new SerializedObject<String>())
 							.fromByteStream(challengeResponseSerialized);
 					System.out.println(challengeResponse);
-					System.out.println("expected response: " + challenge.getField("response"));
 
-					boolean res = challenge.getField("response").equals(challengeResponse);
+					AES aes = new AES(MainServer.getPasswordHash(username));
+					String expectedResponse = aes.encrypt((String)challenge.getField("response"));
+					System.out.println("expected response: " + expectedResponse);
+
+					boolean res = expectedResponse.equals(challengeResponse);
 					// boolean res = true;
 
 					System.out.print("result of login: ");

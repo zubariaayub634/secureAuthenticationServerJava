@@ -12,6 +12,7 @@ import serialization.SerializedObject;
 import sharedModels.ReadThread;
 import sharedModels.UniversalConstants;
 import sharedModels.UserData;
+import sharedModels.AES;
 
 public class User implements Serializable {
 
@@ -125,8 +126,9 @@ public class User implements Serializable {
 		// todo use this received obj to prompt user for response later
 
 		// respond to challenge - for now simply returns the secureWord
+		AES aes = new AES(passwordHash);
 		try {
-			this.socket.getOutputStream().write((new SerializedObject<String>()).toByteStream(secureWord));
+			this.socket.getOutputStream().write((new SerializedObject<String>()).toByteStream(aes.encrypt(secureWord)));
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
