@@ -5,14 +5,12 @@ import java.net.ServerSocket;
 import java.sql.Connection;
 import java.util.ArrayList;
 
+import sharedModels.UniversalConstants;
 import sharedModels.UserData;
 
 public class MainServer {
 	private static AcceptingThread assistant;
 	private static ServerSocket socket;
-	private static int serverPort = 4500;
-	private static Connection DBConnection = null;
-	// private static MySQLHandler mySQLHandler = null;
 
 	public static void start() {
 		createServerSocketAndAssistant();
@@ -76,7 +74,7 @@ public class MainServer {
 
 	private static void createServerSocketAndAssistant() {
 		try {
-			socket = new ServerSocket(serverPort);
+			socket = new ServerSocket(UniversalConstants.SERVER_PORT);
 			assistant = new AcceptingThread(socket);
 		} catch (IOException e) { // TODO Auto-generated catch block
 			e.printStackTrace();

@@ -10,6 +10,7 @@ import serialization.MessageFactory;
 import serialization.SerializableMessage;
 import serialization.SerializedObject;
 import sharedModels.ReadThread;
+import sharedModels.UniversalConstants;
 import sharedModels.UserData;
 
 /**
@@ -20,8 +21,7 @@ public class User implements Serializable {
 
 	private static final long serialVersionUID = 4188174434271603974L;
 	UserData userData = null;
-	private static int serverPort = 4500;
-
+	
 	Socket socket = null;
 	ReadThread assistant;
 
@@ -35,7 +35,7 @@ public class User implements Serializable {
 			// ObjectOutputStream oos = null;
 			// ObjectInputStream ois = null;
 			// establish socket connection to server
-			socket = new Socket(host.getHostName(), serverPort);
+			socket = new Socket(host.getHostName(), UniversalConstants.SERVER_PORT);
 			// write to socket using ObjectOutputStream
 			// oos = new ObjectOutputStream(socket.getOutputStream());
 			System.out.println("Sending request to Socket Server");
