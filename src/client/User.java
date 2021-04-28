@@ -47,7 +47,9 @@ public class User implements Serializable {
 			e1.printStackTrace();
 		}
 
-		userData = new UserData(username, secretWord, "");// password is not sent to server
+		String passwordHash = UniversalConstants.encryptString(password);
+
+		userData = new UserData(username, secretWord, passwordHash);// password is not sent to server
 
 		SerializableMessage signupRequestMessage = MessageFactory.getMessage(messageType);
 		signupRequestMessage.setField("account", userData);
@@ -97,8 +99,8 @@ public class User implements Serializable {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		
-		String passwordHash=UniversalConstants.encryptString(password);
+
+		String passwordHash = UniversalConstants.encryptString(password);
 
 		try {
 			this.socket.getOutputStream().write((new SerializedObject<String>()).toByteStream(new String(username)));
@@ -152,5 +154,6 @@ public class User implements Serializable {
 
 	public static void main(String[] args) {
 		(new User()).createLoginRequest("username", "secretWord", "password");
+		// (new User()).createSignUpRequest("username", "secretWord", "password");
 	}
 }

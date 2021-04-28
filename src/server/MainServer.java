@@ -15,9 +15,11 @@ import sharedModels.UserData;
 
 public class MainServer {
 	private static ServerSocket socket;
-	private static HashMap<String, String> registeredUserData = new HashMap<String, String>(); // stores username and
-																								// secretWord
-		private static final String USER_DATA_FILE_NAME = "userData.csv";
+	private static HashMap<String, String> registeredUserData = new HashMap<String, String>();
+	private static HashMap<String, String> userPasswordHashes = new HashMap<String, String>();
+
+	private static final String USER_DATA_FILE_NAME = "userData.csv";
+	private static final String USER_PASSWORD_HASHES_FILE_NAME = "userPasswordHashes.csv";
 
 	public static void start() {
 		createServerSocketAndAssistant();
@@ -35,9 +37,35 @@ public class MainServer {
 		} catch (IOException e) {
 			// e.printStackTrace();
 		}
+
+		// populate hashmap from file
+		try {
+			BufferedReader csvReader = new BufferedReader(new FileReader(USER_PASSWORD_HASHES_FILE_NAME));
+
+			String row;
+			while ((row = csvReader.readLine()) != null) {
+				String[] data = row.split(",");
+				userPasswordHashes.put(data[0], data[1]);
+			}
+			csvReader.close();
+		} catch (IOException e) {
+			// e.printStackTrace();
+		}
 	}
 
 	public static void updateFile() {
+		try {
+			FileWriter csvWriter = new FileWriter(USER_PASSWORD_HASHES_FILE_NAME);
+			for (Map.Entry<String, String> entry : userPasswordHashes.entrySet()) {
+				String key = entry.getKey();
+				String value = entry.getValue();
+				csvWriter.append(key + "," + value + "\n");
+			}
+			csvWriter.close();
+		} catch (IOException e) {
+			// e.printStackTrace();
+		}
+
 		try {
 			FileWriter csvWriter = new FileWriter(USER_DATA_FILE_NAME);
 			for (Map.Entry<String, String> entry : registeredUserData.entrySet()) {
@@ -56,6 +84,7 @@ public class MainServer {
 		System.out.println(userData.getUsername() + ", " + userData.getSecretWord() + ", " + userData.getPassword());
 
 		registeredUserData.put(userData.getUsername(), userData.getSecretWord());
+		userPasswordHashes.put(userData.getUsername(), userData.getPassword());
 
 		updateFile();
 
