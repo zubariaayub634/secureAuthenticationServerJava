@@ -2,4 +2,4 @@
 *.class
 
 #user data file
-userData.csv
+/userData.csv
