@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import sharedModels.UniversalConstants;
 import sharedModels.UserData;
@@ -11,6 +12,8 @@ import sharedModels.UserData;
 public class MainServer {
 	private static AcceptingThread assistant;
 	private static ServerSocket socket;
+	private static HashMap<String, String> registeredUserData = new HashMap<String, String>(); // stores username and
+																								// password
 
 	public static void start() {
 		createServerSocketAndAssistant();
@@ -55,6 +58,8 @@ public class MainServer {
 
 		// TODO: implement file handling here
 
+		registeredUserData.put(userData.getUsername(), userData.getPassword());
+
 		return true;
 
 	}
@@ -69,7 +74,7 @@ public class MainServer {
 
 		// TODO: implement file handling here
 
-		return false;
+		return registeredUserData.containsKey(username);
 	}
 
 	private static void createServerSocketAndAssistant() {
