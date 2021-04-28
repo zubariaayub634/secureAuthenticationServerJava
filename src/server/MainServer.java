@@ -84,7 +84,7 @@ public class MainServer {
 	 */
 	public static boolean registerUser(UserData userData) {
 		System.out.println("In registerUser");
-		System.out.println(userData.getUsername() + ", " + userData.getEmail() + ", " + userData.getPassword());
+		System.out.println(userData.getUsername() + ", " + userData.getSecretWord() + ", " + userData.getPassword());
 
 		registeredUserData.put(userData.getUsername(), encryptString(userData.getPassword()));
 

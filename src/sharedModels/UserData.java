@@ -9,7 +9,7 @@ public class UserData implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 	private String username;
-	private String email;
+	private String secretWord;
 	private String password;
 	private Date dateOfRegistration = null;
 	private Date lastAccessDate = null;
@@ -19,10 +19,10 @@ public class UserData implements Serializable {
 	 * @param email
 	 * @param password
 	 */
-	public UserData(String username, String email, String password) {
+	public UserData(String username, String secretWord, String password) {
 		super();
 		this.username = username;
-		this.email = email;
+		this.secretWord = secretWord;
 		this.password = password;
 	}
 
@@ -36,8 +36,8 @@ public class UserData implements Serializable {
 	/**
 	 * @return
 	 */
-	public String getEmail() {
-		return email;
+	public String getSecretWord() {
+		return secretWord;
 	}
 
 	/**

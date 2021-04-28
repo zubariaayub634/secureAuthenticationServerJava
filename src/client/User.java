@@ -21,7 +21,7 @@ public class User implements Serializable {
 
 	private static final long serialVersionUID = 4188174434271603974L;
 	UserData userData = null;
-	
+
 	Socket socket = null;
 	ReadThread assistant;
 
@@ -40,7 +40,7 @@ public class User implements Serializable {
 			// oos = new ObjectOutputStream(socket.getOutputStream());
 			System.out.println("Sending request to Socket Server");
 
-			 assistant = new ReadThread(this.socket);
+			assistant = new ReadThread(this.socket);
 
 			// read the server response message
 			// ois = new ObjectInputStream(socket.getInputStream());
@@ -56,18 +56,17 @@ public class User implements Serializable {
 		}
 	}
 
-	public boolean createSignUpRequest(String username, String email, String password) {
-		
+	public boolean createSignUpRequest(String username, String secretWord, String password) {
+
 		String messageType = new String("SignupRequest");
-		
+
 		try {
-			this.socket.getOutputStream()
-					.write((new SerializedObject<String>()).toByteStream(new String(messageType)));
+			this.socket.getOutputStream().write((new SerializedObject<String>()).toByteStream(new String(messageType)));
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
 
-		userData = new UserData(username, email, password);
+		userData = new UserData(username, secretWord, "");// password is not sent to server
 
 		SerializableMessage signupRequestMessage = MessageFactory.getMessage(messageType);
 		signupRequestMessage.setField("account", userData);
@@ -148,6 +147,6 @@ public class User implements Serializable {
 	}
 
 	public static void main(String[] args) {
-		(new User()).createSignUpRequest("username", "email", "password");
+		(new User()).createSignUpRequest("username", "secretWord", "password");
 	}
 }
