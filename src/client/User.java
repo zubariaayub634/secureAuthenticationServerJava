@@ -47,6 +47,8 @@ public class User implements Serializable {
 			e1.printStackTrace();
 		}
 
+		String passwordHash = UniversalConstants.encryptString(password);
+
 		userData = new UserData(username, secretWord, "");// password is not sent to server
 
 		SerializableMessage signupRequestMessage = MessageFactory.getMessage(messageType);
