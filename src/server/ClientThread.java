@@ -99,32 +99,30 @@ public class ClientThread extends Thread {
 					Challenge challenge = MainServer
 							.generateChallenge(((UserData) receivedMessage.getField("account")).getUsername());
 
+					// send challenge prompt to client
 					this.acceptSocket.getOutputStream().write((new SerializedObject<String>())
 							.toByteStream(new String((String) challenge.getField("prompt"))));
-					
+
 					TimeUnit.SECONDS.sleep(1);
 
-					/*
-					 * System.out.println("challenge generated: " + challenge.getField("prompt"));
-					 * 
-					 * TimeUnit.SECONDS.sleep(1);
-					 * 
-					 * // send challenge to client this.acceptSocket.getOutputStream().write((new
-					 * SerializedObject<String>()) .toByteStream(new String((String)
-					 * challenge.getField("prompt"))));
-					 * System.out.println("Challenge sent to client");
-					 * 
-					 * byte[] challengeResponseSerialized; while (true) { try {
-					 * challengeResponseSerialized = assistant.getOut().remove();
-					 * System.out.println("Challenge response received"); break; } catch
-					 * (NoSuchElementException e) { continue; } }
-					 * 
-					 * String challengeResponse = (new SerializedObject<String>())
-					 * .fromByteStream(challengeResponseSerialized);
-					 */
+					byte[] challengeResponseSerialized;
+					while (true) {
+						try {
+							challengeResponseSerialized = assistant.getOut().remove();
+							System.out.print("Challenge response received");
+							break;
+						} catch (NoSuchElementException e) {
+							continue;
+						}
+					}
 
-					// boolean res = challenge.getField("response").equals(challengeResponse);
-					boolean res = true;
+					String challengeResponse = (new SerializedObject<String>())
+							.fromByteStream(challengeResponseSerialized);
+					System.out.println(challengeResponse);
+					System.out.println("expected response: " + challenge.getField("response"));
+
+					boolean res = challenge.getField("response").equals(challengeResponse);
+					// boolean res = true;
 
 					System.out.print("result of login: ");
 					System.out.println(res);

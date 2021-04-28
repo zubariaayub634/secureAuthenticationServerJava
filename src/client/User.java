@@ -111,7 +111,7 @@ public class User implements Serializable {
 
 	}
 
-	public boolean createLoginRequest(String username, String password, String secureWord) {
+	public boolean createLoginRequest(String username, String secureWord, String password) {
 		String msgType = "LoginRequest";
 		try {
 			this.socket.getOutputStream().write((new SerializedObject<String>()).toByteStream(new String(msgType)));
@@ -154,12 +154,14 @@ public class User implements Serializable {
 		// todo use this received obj to prompt user for response later
 
 		// respond to challenge - for now simply returns the secureWord
-		/*
-		 * try { this.socket.getOutputStream().write((new
-		 * SerializedObject<String>()).toByteStream(secureWord)); } catch (IOException
-		 * e1) { e1.printStackTrace(); }
-		 * 
-		 */while (true) {
+
+		try {
+			this.socket.getOutputStream().write((new SerializedObject<String>()).toByteStream(secureWord));
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+
+		while (true) {
 			try {
 				msg = assistant.getOut().remove();
 				break;
