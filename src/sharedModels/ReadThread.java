@@ -53,6 +53,7 @@ public class ReadThread extends Thread {
 			//System.out.println("Socket exception encountered");
 			//System.out.println(e.getMessage());
 			//TODO: find cause of connection reset
+			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

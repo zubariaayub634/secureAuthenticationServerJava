@@ -2,7 +2,9 @@ package server;
 
 import java.net.*;
 import java.util.NoSuchElementException;
+import java.util.concurrent.TimeUnit;
 
+import serialization.Challenge;
 import serialization.MessageFactory;
 import serialization.SerializableMessage;
 import serialization.SerializedObject;
@@ -79,21 +81,66 @@ public class ClientThread extends Thread {
 				 * this.acceptSocket.getOutputStream().write(mType);
 				 * this.acceptSocket.getOutputStream() .write((new
 				 * SerializedObject<GetAllSongs>()).toByteStream((GetAllSongs) getAllSongs)); }
-				 * else if (msgType.equals("LoginRequest")) { System.out.println(msgType); while
-				 * (true) { try { msg = assistant.getOut().remove(); break; } catch
-				 * (NoSuchElementException e) { continue; } } SerializableMessage
-				 * receivedMessage = MessageFactory.getMessage("SignupRequest");
-				 * receivedMessage.fromBinary(msg); boolean res =
-				 * MainServer.verifyUserCredentials((UserData)
-				 * receivedMessage.getField("account")); if (res) {
-				 * this.acceptSocket.getOutputStream().write(mType);
-				 * this.acceptSocket.getOutputStream() .write((new
-				 * SerializedObject<String>()).toByteStream(new String("Successful Login"))); }
-				 * else { this.acceptSocket.getOutputStream().write(mType);
-				 * this.acceptSocket.getOutputStream() .write((new
-				 * SerializedObject<String>()).toByteStream(new String("Login failed")));
-				 * MainServer.clients.remove(this); break; } } else if
-				 * (msgType.equals("PlaylistCreationRequest")) { System.out.println(msgType);
+				 * else
+				 */
+				if (msgType.equals("LoginRequest")) {
+					System.out.println(msgType);
+					while (true) {
+						try {
+							msg = assistant.getOut().remove();
+							break;
+						} catch (NoSuchElementException e) {
+							continue;
+						}
+					}
+					SerializableMessage receivedMessage = MessageFactory.getMessage("SignupRequest");
+					receivedMessage.fromBinary(msg); // contains username only
+
+					Challenge challenge = MainServer
+							.generateChallenge(((UserData) receivedMessage.getField("account")).getUsername());
+
+					this.acceptSocket.getOutputStream().write((new SerializedObject<String>())
+							.toByteStream(new String((String) challenge.getField("prompt"))));
+					
+					TimeUnit.SECONDS.sleep(1);
+
+					/*
+					 * System.out.println("challenge generated: " + challenge.getField("prompt"));
+					 * 
+					 * TimeUnit.SECONDS.sleep(1);
+					 * 
+					 * // send challenge to client this.acceptSocket.getOutputStream().write((new
+					 * SerializedObject<String>()) .toByteStream(new String((String)
+					 * challenge.getField("prompt"))));
+					 * System.out.println("Challenge sent to client");
+					 * 
+					 * byte[] challengeResponseSerialized; while (true) { try {
+					 * challengeResponseSerialized = assistant.getOut().remove();
+					 * System.out.println("Challenge response received"); break; } catch
+					 * (NoSuchElementException e) { continue; } }
+					 * 
+					 * String challengeResponse = (new SerializedObject<String>())
+					 * .fromByteStream(challengeResponseSerialized);
+					 */
+
+					// boolean res = challenge.getField("response").equals(challengeResponse);
+					boolean res = true;
+
+					System.out.print("result of login: ");
+					System.out.println(res);
+
+					if (res) {
+						this.acceptSocket.getOutputStream()
+								.write((new SerializedObject<String>()).toByteStream(new String("Successful Login")));
+					} else {
+						this.acceptSocket.getOutputStream()
+								.write((new SerializedObject<String>()).toByteStream(new String("Login failed")));
+						MainServer.clients.remove(this);
+						break;
+					}
+				} else
+				/*
+				 * if (msgType.equals("PlaylistCreationRequest")) { System.out.println(msgType);
 				 * while (true) { try { msg = assistant.getOut().remove(); break; } catch
 				 * (NoSuchElementException e) { continue; } } SerializableMessage
 				 * receivedMessage = MessageFactory.getMessage("PlaylistCreationRequest");

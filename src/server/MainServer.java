@@ -1,7 +1,6 @@
 package server;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -9,11 +8,11 @@ import java.math.BigInteger;
 import java.net.ServerSocket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import serialization.Challenge;
 import sharedModels.UniversalConstants;
 import sharedModels.UserData;
 
@@ -21,7 +20,7 @@ public class MainServer {
 	private static AcceptingThread assistant;
 	private static ServerSocket socket;
 	private static HashMap<String, String> registeredUserData = new HashMap<String, String>(); // stores username and
-																								// password
+																								// secretWord
 	private static final String CRYPTOGRAPHIC_HASH_FUNCTION = "SHA-512";
 	private static final String USER_DATA_FILE_NAME = "userData.csv";
 
@@ -86,12 +85,16 @@ public class MainServer {
 		System.out.println("In registerUser");
 		System.out.println(userData.getUsername() + ", " + userData.getSecretWord() + ", " + userData.getPassword());
 
-		registeredUserData.put(userData.getUsername(), encryptString(userData.getPassword()));
+		registeredUserData.put(userData.getUsername(), userData.getSecretWord());
 
 		updateFile();
 
 		return true;
 
+	}
+
+	public static Challenge generateChallenge(String username) {
+		return new Challenge("What was your secret word?", registeredUserData.get(username));
 	}
 
 	public static boolean isUsernameAlreadyRegistered(String username) {
