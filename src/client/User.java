@@ -4,13 +4,16 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.NoSuchElementException;
 
+import serialization.MessageFactory;
+import serialization.SerializableMessage;
 import serialization.SerializedObject;
 import sharedModels.ReadThread;
 import sharedModels.UserData;
 
 /**
- * @author zubxx
+ * @author Zubaria Ayub
  *
  */
 public class User implements Serializable {
@@ -37,7 +40,7 @@ public class User implements Serializable {
 			// oos = new ObjectOutputStream(socket.getOutputStream());
 			System.out.println("Sending request to Socket Server");
 
-			// assistant = new ReadThread(this.socket);
+			 assistant = new ReadThread(this.socket);
 
 			// read the server response message
 			// ois = new ObjectInputStream(socket.getInputStream());
@@ -54,40 +57,58 @@ public class User implements Serializable {
 	}
 
 	public boolean createSignUpRequest(String username, String email, String password) {
+		
+		String messageType = new String("SignupRequest");
+		
 		try {
 			this.socket.getOutputStream()
-					.write((new SerializedObject<String>()).toByteStream(new String("SignupRequest")));
+					.write((new SerializedObject<String>()).toByteStream(new String(messageType)));
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 
-		return true;
+		userData = new UserData(username, email, password);
 
-		/*
-		 * userData = new UserData(username, email, password);
-		 * 
-		 * String temp = new String("SignupRequest"); SerializableMessage lr =
-		 * MessageFactory.getMessage(temp); lr.setField("account", userData); UserData t
-		 * = (UserData) lr.getField("account");
-		 * 
-		 * try { this.socket.getOutputStream().write(lr.toBinary()); } catch
-		 * (IOException e1) { // TODO Auto-generated catch block e1.printStackTrace(); }
-		 * 
-		 * System.out.println("Message dispatched to Server"); byte[] mType, msg; while
-		 * (true) { try { mType = assistant.getOut().remove(); break; } catch
-		 * (NoSuchElementException e) { continue; } } System.out.println("m1 received");
-		 * while (true) { try { msg = assistant.getOut().remove(); break; } catch
-		 * (NoSuchElementException e) { continue; } } System.out.println("m2 received");
-		 * String msgType = (new SerializedObject<String>()).fromByteStream(mType);
-		 * String receivedMessage = (new
-		 * SerializedObject<String>()).fromByteStream(msg); if
-		 * (msgType.equals("SignupRequest") &&
-		 * receivedMessage.equals("Successful Signup")) { // this.username = ((Account)
-		 * lr.getField("account")).getUsername();
-		 * System.out.println("Successful Signup"); return true; }
-		 * System.out.println("Signup failed"); return false;
-		 */
+		SerializableMessage signupRequestMessage = MessageFactory.getMessage(messageType);
+		signupRequestMessage.setField("account", userData);
+		UserData t = (UserData) signupRequestMessage.getField("account");
+
+		try {
+			this.socket.getOutputStream().write(signupRequestMessage.toBinary());
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+
+		System.out.println("Message dispatched to Server");
+		byte[] mType, msg;
+		while (true) {
+			try {
+				mType = assistant.getOut().remove();
+				break;
+			} catch (NoSuchElementException e) {
+				continue;
+			}
+		}
+		System.out.println("m1 received");
+		while (true) {
+			try {
+				msg = assistant.getOut().remove();
+				break;
+			} catch (NoSuchElementException e) {
+				continue;
+			}
+		}
+		System.out.println("m2 received");
+		String msgType = (new SerializedObject<String>()).fromByteStream(mType);
+		String receivedMessage = (new SerializedObject<String>()).fromByteStream(msg);
+		if (msgType.equals(messageType) && receivedMessage.equals("Successful Signup")) {
+			// this.username = ((Account)lr.getField("account")).getUsername();
+			System.out.println("Successful Signup");
+			return true;
+		}
+		System.out.println("Signup failed");
+		return false;
+
 	}
 
 	public boolean createLoginRequest(String username, String password) {

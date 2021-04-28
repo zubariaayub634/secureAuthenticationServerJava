@@ -3,8 +3,11 @@ package server;
 import java.net.*;
 import java.util.NoSuchElementException;
 
+import serialization.MessageFactory;
+import serialization.SerializableMessage;
 import serialization.SerializedObject;
 import sharedModels.ReadThread;
+import sharedModels.UserData;
 
 import java.io.*;
 
@@ -116,26 +119,43 @@ public class ClientThread extends Thread {
 				 * getAllSongs.setField("allSongs", table);
 				 * this.acceptSocket.getOutputStream().write(mType);
 				 * this.acceptSocket.getOutputStream() .write((new
-				 * SerializedObject<GetAllSongs>()).toByteStream((GetAllSongs) getAllSongs)); }
-				 * else if (msgType.equals("SignupRequest")) { System.out.println(msgType);
-				 * while (true) { try { msg = assistant.getOut().remove(); break; } catch
-				 * (NoSuchElementException e) { continue; } } SerializableMessage
-				 * receivedMessage = MessageFactory.getMessage(msgType);
-				 * receivedMessage.fromBinary(msg); boolean res =
-				 * this.isUsernameAlreadyRegistered( ((UserData)
-				 * receivedMessage.getField("account")).getUsername()); if (!res) {
-				 * this.acceptSocket.getOutputStream().write(mType);
-				 * this.acceptSocket.getOutputStream() .write((new
-				 * SerializedObject<String>()).toByteStream(new String("Successful Signup")));
-				 * try { MainServer.addUserToDB((UserData) receivedMessage.getField("account"));
-				 * } catch (Exception e) {
-				 * System.out.println("Exception while adding account to db");
-				 * e.printStackTrace(); } } else {
-				 * this.acceptSocket.getOutputStream().write(mType);
-				 * this.acceptSocket.getOutputStream() .write((new
-				 * SerializedObject<String>()).toByteStream(new String("Signup failed")));
-				 * MainServer.clients.remove(this); break; } }
+				 * SerializedObject<GetAllSongs>()).toByteStream((GetAllSongs) getAllSongs));
+				 * }else
 				 */
+				if (msgType.equals("SignupRequest")) {
+					System.out.println(msgType);
+					while (true) {
+						try {
+							msg = assistant.getOut().remove();
+							break;
+						} catch (NoSuchElementException e) {
+							continue;
+						}
+					}
+					System.out.println("Second msg received");
+					SerializableMessage receivedMessage = MessageFactory.getMessage(msgType);
+					receivedMessage.fromBinary(msg);
+					boolean res = MainServer.isUsernameAlreadyRegistered(
+							((UserData) receivedMessage.getField("account")).getUsername());
+					if (!res) {
+						this.acceptSocket.getOutputStream().write(mType);
+						this.acceptSocket.getOutputStream()
+								.write((new SerializedObject<String>()).toByteStream(new String("Successful Signup")));
+						try {
+							MainServer.registerUser((UserData) receivedMessage.getField("account"));
+						} catch (Exception e) {
+							System.out.println("Exception while adding account to db");
+							e.printStackTrace();
+						}
+					} else {
+						this.acceptSocket.getOutputStream().write(mType);
+						this.acceptSocket.getOutputStream()
+								.write((new SerializedObject<String>()).toByteStream(new String("Signup failed")));
+						MainServer.clients.remove(this);
+						break;
+					}
+				}
+
 				/*
 				 * else if (msgType.equals("FriendList")) { Message msgToSend =
 				 * msgFac.getMessage("FriendList"); msgToSend.setField("friendList", (Object)
@@ -181,11 +201,6 @@ public class ClientThread extends Thread {
 	 * String("SendTextMessageToPerson"))); message.setField("receiverUsername",
 	 * senderUsername); this.acceptSocket.getOutputStream().write((new
 	 * SerializedObject<SerializableMessage>()).toByteStream(message)); }
-	 */
-
-	/*
-	 * public boolean isUsernameAlreadyRegistered(String username) { return
-	 * MainServer.isUsernameAlreadyRegistered(username); }
 	 */
 
 	/*

@@ -5,6 +5,8 @@ import java.net.ServerSocket;
 import java.sql.Connection;
 import java.util.ArrayList;
 
+import sharedModels.UserData;
+
 public class MainServer {
 	private static AcceptingThread assistant;
 	private static ServerSocket socket;
@@ -41,22 +43,37 @@ public class MainServer {
 	 * (SQLException e1) { // TODO Auto-generated catch block e1.printStackTrace();
 	 * } data.add(row); } final JTable songsList = new JTable(data, columns);
 	 * resizeColumnWidth(songsList); return songsList; }
-	 * 
-	 * public static boolean addUserToDB(UserData userData) { return
-	 * mySQLHandler.executeUpdate(DBConnection,
-	 * "INSERT INTO user (username, email, password, dateOfRegistration, lastAccessDate) \r\n"
-	 * + "		VALUES ('" + userData.getUsername() + "', '" + userData.getEmail() +
-	 * "', '" + userData.getPassword() + "',now(),now());");
-	 * 
-	 * }
-	 * 
-	 * public static boolean isUsernameAlreadyRegistered(String username) {
-	 * ResultSet r =
-	 * mySQLHandler.runSelectQuery("select * from user where user.username='" +
-	 * username + "';"); try { if (r.next()) { return true; } } catch (SQLException
-	 * e) { // TODO Auto-generated catch block e.printStackTrace(); } return false;
-	 * }
 	 */
+	public static boolean registerUser(UserData userData) {
+		/*
+		 * return mySQLHandler.executeUpdate(DBConnection,
+		 * "INSERT INTO user (username, email, password, dateOfRegistration, lastAccessDate) \r\n"
+		 * + "		VALUES ('" + userData.getUsername() + "', '" + userData.getEmail() +
+		 * "', '" + userData.getPassword() + "',now(),now());");
+		 */
+
+		System.out.println("In registerUser");
+		System.out.println(userData.getUsername() + ", " + userData.getEmail() + ", " + userData.getPassword());
+
+		// TODO: implement file handling here
+
+		return true;
+
+	}
+
+	public static boolean isUsernameAlreadyRegistered(String username) {
+		/*
+		 * ResultSet r =
+		 * mySQLHandler.runSelectQuery("select * from user where user.username='" +
+		 * username + "';"); try { if (r.next()) { return true; } } catch (SQLException
+		 * e) { // TODO Auto-generated catch block e.printStackTrace(); }
+		 */
+
+		// TODO: implement file handling here
+
+		return false;
+	}
+
 	private static void createServerSocketAndAssistant() {
 		try {
 			socket = new ServerSocket(serverPort);
@@ -69,6 +86,6 @@ public class MainServer {
 	public static ArrayList<ClientThread> clients = new ArrayList<ClientThread>();
 
 	public static void main(String[] args) {
-		(new MainServer()).start();
+		MainServer.start();
 	}
 }
