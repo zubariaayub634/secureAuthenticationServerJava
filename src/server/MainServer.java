@@ -1,5 +1,9 @@
 package server;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.ServerSocket;
@@ -8,6 +12,7 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import sharedModels.UniversalConstants;
 import sharedModels.UserData;
@@ -18,10 +23,38 @@ public class MainServer {
 	private static HashMap<String, String> registeredUserData = new HashMap<String, String>(); // stores username and
 																								// password
 	private static final String CRYPTOGRAPHIC_HASH_FUNCTION = "SHA-512";
+	private static final String USER_DATA_FILE_NAME = "userData.csv";
 
 	public static void start() {
 		createServerSocketAndAssistant();
-		// connectToDB();
+
+		// populate hashmap from file
+		try {
+			BufferedReader csvReader = new BufferedReader(new FileReader(USER_DATA_FILE_NAME));
+
+			String row;
+			while ((row = csvReader.readLine()) != null) {
+				String[] data = row.split(",");
+				registeredUserData.put(data[0], data[1]);
+			}
+			csvReader.close();
+		} catch (IOException e) {
+			// e.printStackTrace();
+		}
+	}
+
+	public static void updateFile() {
+		try {
+			FileWriter csvWriter = new FileWriter(USER_DATA_FILE_NAME);
+			for (Map.Entry<String, String> entry : registeredUserData.entrySet()) {
+				String key = entry.getKey();
+				String value = entry.getValue();
+				csvWriter.append(key + "," + value + "\n");
+			}
+			csvWriter.close();
+		} catch (IOException e) {
+			// e.printStackTrace();
+		}
 	}
 
 	/*
@@ -50,19 +83,12 @@ public class MainServer {
 	 * resizeColumnWidth(songsList); return songsList; }
 	 */
 	public static boolean registerUser(UserData userData) {
-		/*
-		 * return mySQLHandler.executeUpdate(DBConnection,
-		 * "INSERT INTO user (username, email, password, dateOfRegistration, lastAccessDate) \r\n"
-		 * + "		VALUES ('" + userData.getUsername() + "', '" + userData.getEmail() +
-		 * "', '" + userData.getPassword() + "',now(),now());");
-		 */
-
 		System.out.println("In registerUser");
 		System.out.println(userData.getUsername() + ", " + userData.getEmail() + ", " + userData.getPassword());
 
-		// TODO: implement file handling here
-
 		registeredUserData.put(userData.getUsername(), encryptString(userData.getPassword()));
+
+		updateFile();
 
 		return true;
 
