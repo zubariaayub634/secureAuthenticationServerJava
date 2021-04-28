@@ -93,11 +93,9 @@ public class ClientThread extends Thread {
 							continue;
 						}
 					}
-					SerializableMessage receivedMessage = MessageFactory.getMessage("SignupRequest");
-					receivedMessage.fromBinary(msg); // contains username only
+					String username = (new SerializedObject<String>()).fromByteStream(msg);
 
-					Challenge challenge = MainServer
-							.generateChallenge(((UserData) receivedMessage.getField("account")).getUsername());
+					Challenge challenge = MainServer.generateChallenge(username);
 
 					// send challenge prompt to client
 					this.acceptSocket.getOutputStream().write((new SerializedObject<String>())
